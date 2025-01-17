@@ -8,11 +8,15 @@ spec:
   secretStoreRef:
     name: secrectstore-vault-backend
     kind: SecretStore
-      #    namespace: external-secrets
   target:
-    name: application-secret
+    name: phonebook-db-secret
   data:
-  - secretKey: secret
+  - secretKey: DB_PASSWORD
     remoteRef:
-      key: phonebook-app/database
+      key: db-secret
       property: DB_PASSWORD
+  - secretKey: DB_ROOT_PASSWORD
+    remoteRef:
+      key: db-secret
+      property: DB_ROOT_PASSWORD
+      

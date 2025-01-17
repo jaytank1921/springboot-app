@@ -29,3 +29,13 @@ Run docker image
   >     Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 # Run the windows script:
   >     .\setup-minikube.ps1
+
+# if kubeclt command is not present 
+  >     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  >     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+  >     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+  >     sudo install kubectl /usr/local/bin/kubectl
+  >     kubectl version --client
+
+# Run app using Kubernetes
+  >     make k8s-deployment

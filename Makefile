@@ -141,3 +141,30 @@ clean-temp:
 	@echo "Cleaning up temporary files..."
 	@rm -f apache-maven-$(MAVEN_VERSION)-bin.tar.gz
 	@echo "Cleanup completed!"
+
+install-helm:
+	@echo "Installing helm"
+	@curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+	@chmod 700 get_helm.sh
+	@./get_helm.sh
+	@sudo rm -rf get_helm.sh
+
+deploy-vault:
+	@helm repo add hashicorp https://helm.releases.hashicorp.com
+	@helm install vault hashicorp/vault --create-namespace --namespace vault --values k8s/deployments/vault/values.yaml
+	@sleep 60
+
+install-external-secrets:
+	@helm repo add external-secrets https://charts.external-secrets.io
+	@helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
+	@sleep 30
+
+deploy-secrets-store:
+	@kubectl create ns phonebook-api-ns
+	@kubectl apply -f k8s/deployments/secrectstore/secretstore.yaml
+	@kubectl apply -f k8s/deployments/secrectstore/externersecrect.yaml
+k8s-app-deploy:
+	@kubectl apply -f k8s/deployments/phonebook-app/database.yaml
+	@kubectl create configmap sql-file --from-file=sql_backup.sql -n phonebook-api-ns
+	@kubectl apply -f k8s/deployments/phonebook-app/application.yaml
+k8s-deployment: install-helm deploy-vault install-external-secrets deploy-secrets-store k8s-app-deploy
